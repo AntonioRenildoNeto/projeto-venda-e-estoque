@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Olá, {{ usuario_logado.nome_completo.split()[0] }}!</h1>
+<div class="resumo">
+  {% if eh_admin %}<div class="cartao"><span class="numero" id="total-usuarios">{{ resumo.usuarios }}</span>usuários</div>{% endif %}
+  <div class="cartao"><span class="numero" id="total-produtos">{{ resumo.produtos }}</span>produtos</div>
+  <div class="cartao"><span class="numero" id="total-compras">{{ resumo.compras }}</span>compras</div>
+  <div class="cartao"><span class="numero" id="total-vendas">{{ resumo.vendas }}</span>vendas</div>
+</div>
+
+<div class="resumo destaque">
+  <div class="cartao"><span class="numero" id="vendas-hoje">{{ resumo.vendas_hoje.total|moeda }}</span>vendido hoje ({{ resumo.vendas_hoje.quantidade }} venda(s))</div>
+  <div class="cartao"><span class="numero" id="vendas-mes">{{ resumo.vendas_mes.total|moeda }}</span>vendido no mês ({{ resumo.vendas_mes.quantidade }} venda(s))</div>
+  <div class="cartao"><span class="numero" id="valor-estoque">{{ resumo.valor_estoque|moeda }}</span>valor em estoque</div>
+</div>
+
+<div class="duas-colunas">
+  <section class="cartao" id="alerta-estoque">
+    <h2>Estoque baixo</h2>
+    {% if resumo.abaixo_do_minimo %}
+    <table>
+      <thead><tr><th>Produto</th><th>Em estoque</th><th>Mínimo</th></tr></thead>
+      <tbody>
+      {% for e in resumo.abaixo_do_minimo %}
+        <tr><td>{{ e.nome }}</td><td class="{{ 'zerado' if e.quantidade == 0 else 'baixo' }}">{{ e.quantidade }}</td><td>{{ e.estoque_minimo }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="vazio">Nenhum produto abaixo do estoque mínimo.</p>
+    {% endif %}
+  </section>
+  <section class="cartao" id="mais-vendidos">
+    <h2>Mais vendidos</h2>
+    {% if resumo.mais_vendidos %}
+    {% set maior = resumo.mais_vendidos[0].unidades %}
+    <ul class="barras">
+      {% for m in resumo.mais_vendidos %}
+      <li><span class="barra-nome">{{ m.nome }}</span>
+        <progress max="{{ maior }}" value="{{ m.unidades }}"></progress>
+        <span class="barra-valor">{{ m.unidades }} un.</span></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="vazio">Ainda não há vendas.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titulo %}Relatórios{% endblock %}
+{% block conteudo %}
+<h1>Relatório de vendas</h1>
+<section class="cartao">
+  <form method="get" class="grade" id="form-relatorio">
+    <div><label for="inicio">De</label><input type="date" id="inicio" name="inicio" value="{{ inicio.isoformat() }}"></div>
+    <div><label for="fim">Até</label><input type="date" id="fim" name="fim" value="{{ fim.isoformat() }}"></div>
+    <div class="acao"><button type="submit" id="btn-filtrar" class="btn">Filtrar</button></div>
+    <div class="acao"><a class="btn secundario-azul" id="btn-exportar-vendas" href="{{ url_for('relatorios.vendas_csv', inicio=inicio.isoformat(), fim=fim.isoformat()) }}">Exportar CSV</a></div>
+  </form>
+</section>
+{% if dados %}
+<div class="resumo">
+  <div class="cartao"><span class="numero" id="rel-total">{{ dados.total|moeda }}</span>vendido no período</div>
+  <div class="cartao"><span class="numero" id="rel-quantidade">{{ dados.quantidade }}</span>vendas concluídas</div>
+  <div class="cartao"><span class="numero" id="rel-canceladas">{{ dados.canceladas }}</span>canceladas</div>
+</div>
+<section class="cartao">
+  <h2>Produtos mais vendidos no período</h2>
+  <div class="tabela-rolagem">
+  <table id="tabela-mais-vendidos">
+    <thead><tr><th>Produto</th><th>Unidades</th><th>Receita</th></tr></thead>
+    <tbody>
+    {% for m in dados.mais_vendidos %}
+      <tr><td>{{ m.nome }}</td><td>{{ m.unidades }}</td><td>{{ m.receita|moeda }}</td></tr>
+    {% else %}
+      <tr><td colspan="3" class="vazio">Nenhuma venda no período.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

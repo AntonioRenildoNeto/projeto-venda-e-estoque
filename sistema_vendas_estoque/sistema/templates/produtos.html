@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block titulo %}Produtos{% endblock %}
+{% block conteudo %}
+<h1>Produtos</h1>
+{% if eh_admin %}
+<section class="cartao">
+  <h2>Cadastrar produto</h2>
+  <form method="post" action="{{ url_for('produtos.cadastrar') }}" id="form-produto" class="grade">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div><label for="nome">Nome</label><input id="nome" name="nome" required maxlength="80"></div>
+    <div><label for="tipo">Tipo</label>
+      <select id="tipo" name="tipo">{% for t in tipos %}<option value="{{ t }}">{{ t }}</option>{% endfor %}</select></div>
+    <div><label for="preco">Preço (R$)</label><input id="preco" name="preco" inputmode="decimal" placeholder="0,00" required></div>
+    <div><label for="estoque_minimo">Estoque mínimo</label><input id="estoque_minimo" name="estoque_minimo" type="number" min="0" step="1" value="0"></div>
+    <div class="acao"><button type="submit" id="btn-cadastrar-produto" class="btn">Cadastrar</button></div>
+  </form>
+</section>
+{% endif %}
+<section class="cartao">
+  <h2>Produtos cadastrados</h2>
+  <form method="get" class="busca">
+    <input name="busca" id="busca" value="{{ busca }}" placeholder="Buscar por nome">
+    <button type="submit" id="btn-buscar" class="btn secundario">Buscar</button>
+  </form>
+  <div class="tabela-rolagem">
+  <table id="tabela-produtos">
+    <thead><tr><th>ID</th><th>Nome</th><th>Tipo</th><th>Preço</th><th>Mínimo</th>{% if eh_admin %}<th></th>{% endif %}</tr></thead>
+    <tbody>
+    {% for p in produtos %}
+      <tr id="linha-produto-{{ p.id }}">
+        <td>{{ p.id }}</td><td>{{ p.nome }}</td><td>{{ p.tipo }}</td><td>{{ p.preco|moeda }}</td><td>{{ p.estoque_minimo }}</td>
+        {% if eh_admin %}<td class="acoes">
+          <a href="{{ url_for('produtos.editar', produto_id=p.id) }}" id="btn-editar-produto-{{ p.id }}" class="btn secundario-azul">Editar</a>
+          <form method="post" action="{{ url_for('produtos.remover', produto_id=p.id) }}" data-confirmar="Remover o produto {{ p.nome }}? Ele sairá do estoque (o histórico é mantido).">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" id="btn-remover-produto-{{ p.id }}" class="btn perigo">Remover</button>
+          </form>
+        </td>{% endif %}
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="vazio">Nenhum produto encontrado.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+{% endblock %}

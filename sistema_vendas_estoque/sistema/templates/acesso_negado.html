@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block titulo %}Acesso negado{% endblock %}
+{% block conteudo %}
+<section class="cartao">
+  <h1>Acesso negado</h1>
+  <p id="texto-acesso-negado">{{ mensagem }}</p>
+  <a class="btn" href="{{ url_for('painel.inicio') }}">Voltar ao início</a>
+</section>
+{% endblock %}

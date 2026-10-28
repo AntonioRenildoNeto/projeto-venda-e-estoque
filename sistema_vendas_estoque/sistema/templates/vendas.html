@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% from "_paginacao.html" import paginacao %}
+{% block titulo %}Vendas{% endblock %}
+{% block conteudo %}
+<h1>Vendas</h1>
+<section class="cartao">
+  <h2>Registrar venda (saída do estoque)</h2>
+  <form method="post" action="{{ url_for('operacoes.registrar_venda') }}" id="form-venda">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="itens" id="itens-venda">
+      <div class="item-linha grade">
+        <div><label for="produto_id">Produto</label>
+          <select id="produto_id" name="produto_id" required>
+            <option value="">Selecione...</option>
+            {% for e in estoque %}<option value="{{ e.produto_id }}"{% if e.produto_id == selecionado %} selected{% endif %}>{{ e.nome }} — {{ e.preco|moeda }} ({{ e.quantidade }} em estoque)</option>{% endfor %}
+          </select></div>
+        <div><label for="quantidade">Quantidade</label><input id="quantidade" name="quantidade" type="number" min="1" step="1" required></div>
+        <div class="acao"><button type="button" class="btn perigo btn-remover-item" hidden>Remover item</button></div>
+      </div>
+    </div>
+    <div class="barra-acoes">
+      <button type="button" id="btn-adicionar-item" class="btn secundario-azul" data-alvo="itens-venda" hidden>+ Adicionar outro produto</button>
+      <button type="submit" id="btn-registrar-venda" class="btn">Registrar venda</button>
+    </div>
+  </form>
+</section>
+<section class="cartao">
+  <h2>Vendas registradas</h2>
+  <div class="tabela-rolagem">
+  <table id="tabela-vendas">
+    <thead><tr><th>Nº</th><th>Data</th><th>Itens</th><th>Total</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for v in vendas %}
+      <tr id="linha-venda-{{ v.id }}">
+        <td>{{ v.id }}</td><td>{{ v.data|data }}</td>
+        <td>{% for i in v['itens'] %}{{ i.quantidade }} × {{ i.produto_nome }} a {{ i.preco_unitario|moeda }}<br>{% endfor %}</td>
+        <td>{{ v.total|moeda }}</td>
+        <td id="status-venda-{{ v.id }}"><span class="selo-status {{ 'ok' if v.status == 'concluida' else 'erro' }}">{{ v.status|status }}</span></td>
+        <td>{% if v.status == 'concluida' %}
+          <form method="post" action="{{ url_for('operacoes.cancelar_venda', venda_id=v.id) }}" data-confirmar="Cancelar a venda #{{ v.id }}? As unidades voltam ao estoque.">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" id="btn-cancelar-venda-{{ v.id }}" class="btn perigo">Cancelar</button>
+          </form>{% endif %}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="vazio">Nenhuma venda registrada.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {{ paginacao(pag) }}
+</section>
+{% endblock %}

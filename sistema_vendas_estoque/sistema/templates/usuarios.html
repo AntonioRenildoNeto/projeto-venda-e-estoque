@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block titulo %}Usuários{% endblock %}
+{% block conteudo %}
+<h1>Usuários</h1>
+<section class="cartao">
+  <h2>Cadastrar usuário</h2>
+  <form method="post" action="{{ url_for('usuarios.cadastrar') }}" id="form-usuario" class="grade">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div><label for="id">ID</label><input id="id" name="id" required maxlength="20"></div>
+    <div><label for="nome_completo">Nome completo</label><input id="nome_completo" name="nome_completo" required></div>
+    <div><label for="email">E-mail</label><input type="email" id="email" name="email" required></div>
+    <div><label for="telefone">Telefone</label><input id="telefone" name="telefone" placeholder="(11) 91234-5678" required></div>
+    <div><label for="senha">Senha</label><input type="password" id="senha" name="senha" required minlength="6"></div>
+    <div><label for="perfil">Perfil</label>
+      <select id="perfil" name="perfil"><option value="comum">Comum</option><option value="admin">Admin</option></select></div>
+    <div class="acao"><button type="submit" id="btn-cadastrar-usuario" class="btn">Cadastrar</button></div>
+  </form>
+</section>
+<section class="cartao">
+  <h2>Usuários cadastrados</h2>
+  <table id="tabela-usuarios">
+    <thead><tr><th>ID</th><th>Nome completo</th><th>E-mail</th><th>Telefone</th><th>Perfil</th><th></th></tr></thead>
+    <tbody>
+    {% for u in usuarios %}
+      <tr id="linha-usuario-{{ u.id }}">
+        <td>{{ u.id }}</td><td>{{ u.nome_completo }}</td><td>{{ u.email }}</td><td>{{ u.telefone }}</td><td>{{ u.perfil }}</td>
+        <td>
+          <form method="post" action="{{ url_for('usuarios.remover', id=u.id) }}" data-confirmar="Remover o usuário {{ u.id }}?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" id="btn-remover-usuario-{{ u.id }}" class="btn perigo">Remover</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

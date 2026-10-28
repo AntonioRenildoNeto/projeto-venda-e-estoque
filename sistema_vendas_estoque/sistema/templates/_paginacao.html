@@ -1,0 +1,9 @@
+{% macro paginacao(pag) %}
+{% if pag.paginas > 1 %}
+<nav class="paginacao" aria-label="Páginas">
+  {% if pag.pagina > 1 %}<a href="?pagina={{ pag.pagina - 1 }}" class="filtro" id="pagina-anterior">‹ Anterior</a>{% endif %}
+  <span class="nota">Página {{ pag.pagina }} de {{ pag.paginas }} ({{ pag.total }} registros)</span>
+  {% if pag.pagina < pag.paginas %}<a href="?pagina={{ pag.pagina + 1 }}" class="filtro" id="pagina-proxima">Próxima ›</a>{% endif %}
+</nav>
+{% endif %}
+{% endmacro %}

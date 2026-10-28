@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block titulo %}Estoque{% endblock %}
+{% block conteudo %}
+<h1>Estoque</h1>
+<section class="cartao">
+  {% if eh_admin %}<p class="nota"><a href="{{ url_for('relatorios.estoque_csv') }}" id="btn-exportar-estoque">Exportar estoque (CSV)</a></p>{% endif %}
+  <div class="tabela-rolagem">
+  <table id="tabela-estoque">
+    <thead><tr><th>ID</th><th>Produto</th><th>Tipo</th><th>Preço</th><th>Quantidade</th><th>Situação</th><th></th></tr></thead>
+    <tbody>
+    {% for i in itens %}
+      <tr id="linha-estoque-{{ i.produto_id }}">
+        <td>{{ i.produto_id }}</td><td>{{ i.nome }}</td><td>{{ i.tipo }}</td><td>{{ i.preco|moeda }}</td>
+        <td id="qtd-produto-{{ i.produto_id }}" class="{{ 'zerado' if i.quantidade == 0 else '' }}">{{ i.quantidade }}</td>
+        <td>{% if i.quantidade == 0 %}<span class="selo-status erro">Sem estoque</span>
+            {% elif i.estoque_minimo and i.quantidade <= i.estoque_minimo %}<span class="selo-status aviso">Abaixo do mínimo ({{ i.estoque_minimo }})</span>
+            {% else %}<span class="selo-status ok">Normal</span>{% endif %}</td>
+        <td><a href="{{ url_for('estoque.movimentos', produto_id=i.produto_id) }}" id="btn-movimentos-{{ i.produto_id }}">Histórico</a></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7" class="vazio">Nenhum produto no estoque.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+{% endblock %}

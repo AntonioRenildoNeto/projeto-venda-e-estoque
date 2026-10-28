@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}Movimentos de estoque{% endblock %}
+{% block conteudo %}
+<h1>Histórico: {{ produto.nome }}</h1>
+<p class="nota">Quantidade atual: <strong id="quantidade-atual">{{ quantidade }}</strong> · <a href="{{ url_for('estoque.listar') }}">Voltar ao estoque</a></p>
+<section class="cartao">
+  <div class="tabela-rolagem">
+  <table id="tabela-movimentos">
+    <thead><tr><th>Data</th><th>Tipo</th><th>Quantidade</th><th>Motivo</th></tr></thead>
+    <tbody>
+    {% for m in movimentos %}
+      <tr><td>{{ m.data|data }}</td>
+          <td>{{ 'Entrada' if m.tipo == 'entrada' else 'Saída' }}</td>
+          <td class="{{ 'positivo' if m.quantidade > 0 else 'negativo' }}">{{ '%+d' % m.quantidade }}</td>
+          <td>{{ m.motivo }}</td></tr>
+    {% else %}
+      <tr><td colspan="4" class="vazio">Nenhuma movimentação ainda.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+{% endblock %}

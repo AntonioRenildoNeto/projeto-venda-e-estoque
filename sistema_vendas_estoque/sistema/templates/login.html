@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block titulo %}Login - Sistema de Vendas e Estoque{% endblock %}
+{% block conteudo %}
+<section class="cartao login">
+  <h1>Sistema de Vendas e Estoque</h1>
+  <p class="sub">Entre com seu e-mail e senha.</p>
+  <form method="post" action="{{ url_for('auth.login') }}" id="form-login">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="email">E-mail</label>
+    <input type="email" id="email" name="email" autocomplete="username" required autofocus>
+    <label for="senha">Senha</label>
+    <input type="password" id="senha" name="senha" autocomplete="current-password" required>
+    <button type="submit" id="btn-entrar" class="btn">Entrar</button>
+  </form>
+</section>
+{% endblock %}

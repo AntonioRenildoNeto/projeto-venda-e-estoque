@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "_paginacao.html" import paginacao %}
+{% block titulo %}Compras{% endblock %}
+{% block conteudo %}
+<h1>Compras</h1>
+<section class="cartao">
+  <h2>Registrar compra (entrada no estoque)</h2>
+  <form method="post" action="{{ url_for('operacoes.registrar_compra') }}" id="form-compra">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="itens" id="itens-compra">
+      <div class="item-linha grade">
+        <div><label for="produto_id">Produto</label>
+          <select id="produto_id" name="produto_id" required>
+            <option value="">Selecione...</option>
+            {% for p in produtos %}<option value="{{ p.id }}">{{ p.nome }} ({{ p.tipo }})</option>{% endfor %}
+          </select></div>
+        <div><label for="quantidade">Quantidade</label><input id="quantidade" name="quantidade" type="number" min="1" step="1" required></div>
+        <div><label for="preco_unitario">Preço unitário (R$)</label><input id="preco_unitario" name="preco_unitario" inputmode="decimal" required></div>
+        <div class="acao"><button type="button" class="btn perigo btn-remover-item" hidden>Remover item</button></div>
+      </div>
+    </div>
+    <div class="barra-acoes">
+      <button type="button" id="btn-adicionar-item" class="btn secundario-azul" data-alvo="itens-compra" hidden>+ Adicionar outro produto</button>
+      <button type="submit" id="btn-registrar-compra" class="btn">Registrar compra</button>
+    </div>
+  </form>
+</section>
+<section class="cartao">
+  <h2>Compras registradas</h2>
+  <div class="tabela-rolagem">
+  <table id="tabela-compras">
+    <thead><tr><th>Nº</th><th>Data</th><th>Itens</th><th>Total</th></tr></thead>
+    <tbody>
+    {% for c in compras %}
+      <tr id="linha-compra-{{ c.id }}">
+        <td>{{ c.id }}</td><td>{{ c.data|data }}</td>
+        <td>{% for i in c['itens'] %}{{ i.quantidade }} × {{ i.produto_nome }} a {{ i.preco_unitario|moeda }}<br>{% endfor %}</td>
+        <td>{{ c.total|moeda }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="4" class="vazio">Nenhuma compra registrada.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {{ paginacao(pag) }}
+</section>
+{% endblock %}

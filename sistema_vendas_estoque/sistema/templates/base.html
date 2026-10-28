@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Sistema de Vendas e Estoque{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+</head>
+<body>
+{% if usuario_logado %}
+{% set ep = request.endpoint or '' %}
+<header class="topo">
+  <strong class="marca">Vendas &amp; Estoque</strong>
+  <nav aria-label="Menu principal">
+    <a href="{{ url_for('painel.inicio') }}" id="menu-inicio"{% if ep == 'painel.inicio' %} class="ativo" aria-current="page"{% endif %}>Início</a>
+    {% if eh_admin %}<a href="{{ url_for('usuarios.listar') }}" id="menu-usuarios"{% if ep.startswith('usuarios.') %} class="ativo" aria-current="page"{% endif %}>Usuários</a>{% endif %}
+    <a href="{{ url_for('produtos.listar') }}" id="menu-produtos"{% if ep.startswith('produtos.') and ep != 'produtos.catalogo' %} class="ativo" aria-current="page"{% endif %}>Produtos</a>
+    <a href="{{ url_for('produtos.catalogo') }}" id="menu-catalogo"{% if ep == 'produtos.catalogo' %} class="ativo" aria-current="page"{% endif %}>Catálogo</a>
+    <a href="{{ url_for('operacoes.compras') }}" id="menu-compras"{% if ep == 'operacoes.compras' %} class="ativo" aria-current="page"{% endif %}>Compras</a>
+    <a href="{{ url_for('operacoes.vendas') }}" id="menu-vendas"{% if ep == 'operacoes.vendas' %} class="ativo" aria-current="page"{% endif %}>Vendas</a>
+    <a href="{{ url_for('estoque.listar') }}" id="menu-estoque"{% if ep.startswith('estoque.') %} class="ativo" aria-current="page"{% endif %}>Estoque</a>
+    {% if eh_admin %}
+    <a href="{{ url_for('relatorios.vendas') }}" id="menu-relatorios"{% if ep.startswith('relatorios.') %} class="ativo" aria-current="page"{% endif %}>Relatórios</a>
+    <a href="{{ url_for('relatorios.auditoria') }}" id="menu-auditoria"{% if ep == 'relatorios.auditoria' %} class="ativo" aria-current="page"{% endif %}>Auditoria</a>
+    {% endif %}
+  </nav>
+  <form method="post" action="{{ url_for('auth.logout') }}" class="sair">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <a href="{{ url_for('conta.senha') }}" class="link-conta" id="menu-senha" title="Alterar minha senha"><span id="usuario-logado">{{ usuario_logado.nome_completo }} ({{ usuario_logado.perfil }})</span></a>
+    <button type="submit" id="btn-sair" class="btn secundario">Sair</button>
+  </form>
+</header>
+{% endif %}
+<main class="conteudo">
+  {% with mensagens = get_flashed_messages(with_categories=true) %}
+    {% for categoria, texto in mensagens %}
+      <div class="mensagem {{ categoria }}" id="mensagem-{{ categoria }}" role="alert">{{ texto }}</div>
+    {% endfor %}
+  {% endwith %}
+  {% block conteudo %}{% endblock %}
+</main>
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>
